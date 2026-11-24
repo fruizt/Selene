@@ -40,11 +40,11 @@ Tom Mitchell's (1997):
 
 1. So we beginign by the following exercise:
 
-Given a set of points (which have some noise) give a line that fit the best. 
+Given a set of points (which have some noise) give a line that fit the best.
 
 So the idea here is that we are going to build a model that will have some parameters which given the data will change to then fit the best.
 
-## Parameters 
+## Parameters
 
 b -> intersection with Y.
 m -> slope of the line.
@@ -57,16 +57,66 @@ So here adjusting the parameters requires a way to do it. How can one know if in
 
 The gradient tells us the right direction to move the parameters before moving them. So it is not by guessing that we move the parameters but by using the gradient.
 
+## Model
+
+The model is a function that takes some input and predicts the output. This definition is super general.
+
+How does it work?
+
+The model have a set of parameters. Using this parameters the model will generate an output. That output can be 'verfied' against the real answer, basically the prediction (output) is evaluated to see how good it is. This evaluation is call `Loss`.
+
+```
+M(m,b)
+```
+
 ## Loss
 
-So we said that the parameters will be auto adjusted in a process call `learning`. But how do they get adjusted? Certainly not by trail and error but following the next strategy.
+Loss is a function that measures **how wrong a model's prediction are**.
 
-We will calculate the `loss` as a function of the parameters so in our case `(m,b)`
+Input: the model's prediction and the true answers. The model's predictions are a function of the parameters therefore the loss function also have them as the paramenters. `therefore here is not appropiate I think`
+
+Otput: a number that represent how wrong is the prediction. **Lower is better**.
+
+Given a set of parameters there will be a result. That result is 'evaluated' (the result of the system vs the right answer) using the loss function.
+
+The loss function has the same parameters as the model.
+
+Here in our case `loss` is the following:
 
 ```
 L(m,b) = average over all the points (m * x_i + b - y_i)^2
 ```
 
-where `x_i` is the point, `y_i` is the predicted point. So we have them.
+where `m`, `b` are the same parameters of our model, the slope and the intersect with the `Y` axis respectively. And $x_i$ and $y_i$ are a data point $(x_i,y_i)$
 
+Trainning is the search for parameters that minimize the loss.
 
+The loss in our case for one point:
+
+$({y*}_i - y_i)^2$
+
+Where ${y*}_i = m * x_i + b$ basically ${y*}_i$ is the output of the model on the point $x_i$.
+
+Then of course the square error between the real point and the predicted point is $d(y_i,{y*}_i) =  ({y*}_i - y_i)^2$
+
+Then the loss function in our case is:
+
+$L(m,b) = \frac{1}{N} * \sum_{i=0}^{N} ({y*}_i - y_i)^2$
+
+$L(m,b) = \frac{1}{N} * \sum_{i=0}^{N} (m * x_i + b - y_i)^2$
+
+It can be seen here $L(m,b)$ is function whose parameters are real numbers and is differentiable, Why? because is a polynomial function. Then we can discuss it's gradient.
+
+Let us first take notice of the following:
+
+The derivate of a function of one variable $f(x)$ defines the slope of the tangent line at each of the points.
+
+$f'(x)$
+
+Then for multy variable functions $f(x,y)$ we can define the partial derivates. The partial derivates is the derivate respect to each variable
+
+$\frac{\partial f}{\partial x}$ is the partial derivate of $x$ only.
+
+Then the vector of all partial derivates is called the Gradient
+
+$\nabla f(x, y) = (\frac{\partial f}{\partial x}, \frac{\partial f}{\partial y})$
