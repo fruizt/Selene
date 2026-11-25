@@ -117,6 +117,8 @@ void run_model()
     double y[] = {2, 5, 5, 8};
 
     double inference_result[n];
+
+    double last_loss = 0;
     double loss;
 
     for (int i = 0; i < max_iterations; i++)
@@ -128,7 +130,7 @@ void run_model()
         loss = calculate_mean_squared_error(inference_result, y, n);
         printf("Loss: %f \n", loss);
 
-        if (loss <= epsilon)
+        if (fabs(loss - last_loss) <= epsilon)
         {
             break;
         }
