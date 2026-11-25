@@ -9,14 +9,14 @@ static double b = 0;
 // number of max iterations the model runs
 static int max_iterations = 100;
 
-// If the the sqared root error(loss) is equal or less than epsilon then we stop iterating.
-static double epsilon = 0.3;
+// If the change of loss |last loss - current_loss|<=\epsilon is less than epsilon then we stop
+static double epsilon = 0.05;
 
 /// Learning rate
 static double alpha = 0.05;
 
 // Optional function that overwrites the initial set of parameters
-void set_parameters_init(double l_slope, double l_b)
+static void set_parameters_init(double l_slope, double l_b)
 {
     slope = l_slope;
     b = l_b;
@@ -25,12 +25,12 @@ void set_parameters_init(double l_slope, double l_b)
 }
 
 // y* = mx + b
-double infer(double x)
+static double infer(double x)
 {
     return (slope * x) + b;
 }
 
-void calculate_inference(double x[], double inference_result[], int n)
+static void calculate_inference(double x[], double inference_result[], int n)
 {
     for (int i = 0; i < n; i++)
     {
@@ -44,7 +44,7 @@ void calculate_inference(double x[], double inference_result[], int n)
 
 /// Loss function
 //  L(m, b) = average over all points of (m·xᵢ + b − yᵢ)²
-double calculate_mean_squared_error(double inference_result[], double y[], int n)
+static double calculate_mean_squared_error(double inference_result[], double y[], int n)
 {
     double result = 0;
 
@@ -62,7 +62,7 @@ double calculate_mean_squared_error(double inference_result[], double y[], int n
     return result;
 }
 
-double calcuate_partial_derivate_of_slope(double inference_result[], double y[], double x[], int n)
+static double calcuate_partial_derivate_of_slope(double inference_result[], double y[], double x[], int n)
 {
     double result = 0;
 
@@ -78,7 +78,7 @@ double calcuate_partial_derivate_of_slope(double inference_result[], double y[],
     return result;
 }
 
-double calcuate_partial_derivate_of_b(double inference_result[], double y[], int n)
+static double calcuate_partial_derivate_of_b(double inference_result[], double y[], int n)
 {
     double result = 0;
 
@@ -94,7 +94,7 @@ double calcuate_partial_derivate_of_b(double inference_result[], double y[], int
     return result;
 }
 
-void adjust_parameters(double inference_result[], double y[], double x[], int n)
+static void adjust_parameters(double inference_result[], double y[], double x[], int n)
 {
     // Gradient
     double delta_m = calcuate_partial_derivate_of_slope(inference_result, y, x, n);
@@ -128,17 +128,23 @@ void run_model()
         calculate_inference(x, inference_result, n);
 
         loss = calculate_mean_squared_error(inference_result, y, n);
-        printf("Loss: %f \n", loss);
 
         if (fabs(loss - last_loss) <= epsilon)
         {
             break;
         }
 
+        printf("Loss: %f \n", loss);
+
+        last_loss = loss;
+
         adjust_parameters(inference_result, y, x, n);
 
         printf("\n");
     }
+
+    printf("slope: %f \n", slope);
+    printf("b: %f \n", b);
 
     return;
 }
