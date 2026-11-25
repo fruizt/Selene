@@ -12,6 +12,9 @@ static int max_iterations = 100;
 // If the the sqared root error(loss) is equal or less than epsilon then we stop iterating.
 static double epsilon = 0.3;
 
+/// Learning rate
+static double alpha = 0.05;
+
 // Optional function that overwrites the initial set of parameters
 void set_parameters_init(double l_slope, double l_b)
 {
@@ -47,14 +50,14 @@ double calculate_mean_squared_error(double inference_result[], double y[], int n
 
     for (int i = 0; i < n; i++)
     {
-        double partial_result = exp2f(inference_result[i] - y[i]);
+        double partial_result = pow(inference_result[i] - y[i], 2);
 
-        printf("partial error: %f \n", partial_result);
+        printf("partial error: (%f - %f)^2  = %f \n", inference_result[i], y[i], partial_result);
 
         result += partial_result;
     }
 
-    result = result * (1 / n);
+    result = result * ((double)1 / n);
 
     return result;
 }
@@ -70,7 +73,7 @@ double calcuate_partial_derivate_of_slope(double inference_result[], double y[],
         result += partial_result;
     }
 
-    result = result * (2 / n);
+    result = result * ((double)2 / n);
 
     return result;
 }
@@ -86,7 +89,7 @@ double calcuate_partial_derivate_of_b(double inference_result[], double y[], int
         result += partial_result;
     }
 
-    result = result * (2 / n);
+    result = result * ((double)2 / n);
 
     return result;
 }
@@ -97,9 +100,12 @@ void adjust_parameters(double inference_result[], double y[], double x[], int n)
     double delta_m = calcuate_partial_derivate_of_slope(inference_result, y, x, n);
     double delta_b = calcuate_partial_derivate_of_b(inference_result, y, n);
 
+    printf("delta_m: %f \n", delta_m);
+    printf("delta_b: %f \n", delta_b);
+
     // Adjusting parameters
-    slope -= delta_m;
-    b -= delta_b;
+    slope -= (delta_m * alpha);
+    b -= (delta_b * alpha);
 }
 
 void run_model()
@@ -108,7 +114,7 @@ void run_model()
     int n = 4;
 
     double x[] = {1, 2, 3, 4};
-    double y[] = {2, 18, 6, 8};
+    double y[] = {2, 5, 5, 8};
 
     double inference_result[n];
     double loss;

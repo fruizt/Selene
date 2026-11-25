@@ -204,4 +204,4 @@ The partial derivate of $b$
 
 $\frac{\partial L}{\partial b} = \frac{2}{N}\sum_{i=0}^{N-1}[(x_i * m + b)-y_i]$
 
-
+$\hat{y}$
