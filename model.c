@@ -49,6 +49,8 @@ double calculate_mean_squared_error(double inference_result[], double y[], int n
     {
         double partial_result = exp2f(inference_result[i] - y[i]);
 
+        printf("partial error: %f \n", partial_result);
+
         result += partial_result;
     }
 
@@ -113,6 +115,8 @@ void run_model()
 
     for (int i = 0; i < max_iterations; i++)
     {
+        printf("ITERATION: %i -----------------------------\n", i);
+
         calculate_inference(x, inference_result, n);
 
         loss = calculate_mean_squared_error(inference_result, y, n);
@@ -124,6 +128,8 @@ void run_model()
         }
 
         adjust_parameters(inference_result, y, x, n);
+
+        printf("\n");
     }
 
     return;
