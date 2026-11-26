@@ -1,4 +1,5 @@
 #include <math.h>
+#include <stdbool.h>
 #include <stdio.h>
 
 /// Model Parameters.
@@ -11,6 +12,7 @@ static int max_iterations = 100;
 
 // If the change of loss |last loss - current_loss|<= \tolerance is less than tolerance then we stop
 static double tolerance = 0.05;
+static double tolerance_for_relative_check = 0.00005;
 
 /// Learning rate
 static double alpha = 0.05;
@@ -108,6 +110,32 @@ static void adjust_parameters(double inference_result[], double y[], double x[],
     b -= (delta_b * alpha);
 }
 
+static bool is_absolute_stopping_criteria_satisfied(double current_loss, double prior_loss)
+{
+    double delta_error = fabs(current_loss - prior_loss);
+
+    if (delta_error <= tolerance)
+    {
+        printf(">> Absolute error change stopping createria fullfilled: Error diference: %f, tolerance (absolute): %f \n", delta_error, tolerance);
+        return true;
+    }
+
+    return false;
+}
+
+static bool is_relative_stopping_criteria_satisfied(double current_loss, double prior_loss)
+{
+    double delta_error = fabs(current_loss - prior_loss) / fabs(prior_loss);
+
+    if (delta_error <= tolerance_for_relative_check)
+    {
+        printf(">> Relative error change stopping createria fullfilled: Error diference: %f, tolerance (relative): %f \n", delta_error, tolerance_for_relative_check);
+        return true;
+    }
+
+    return false;
+}
+
 void run_model()
 {
     /// Dummy test
@@ -129,7 +157,7 @@ void run_model()
 
         loss = calculate_mean_squared_error(inference_result, y, n);
 
-        if (fabs(loss - last_loss) <= tolerance)
+        if (is_relative_stopping_criteria_satisfied(loss, last_loss))
         {
             break;
         }
