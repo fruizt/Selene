@@ -205,3 +205,17 @@ The partial derivate of $b$
 $\frac{\partial L}{\partial b} = \frac{2}{N}\sum_{i=0}^{N-1}[(x_i * m + b)-y_i]$
 
 $\hat{y}$
+
+---
+
+# Stopping criterion (convergence criterion)
+
+The rules that determine when the learning iterations stops. In this case this rules is depending on the absolute loss. So when the change of loss is minor than a set parameter `tol` (that parameter being the *tolerance*) the iteration stops.
+
+```
+stop at iteration k  when  |L(θₖ) − L(θₖ₋₁)| ≤ ε
+```
+
+where θ ("theta") is the standard symbol for "all the parameters".
+
+

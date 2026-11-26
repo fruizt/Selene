@@ -9,8 +9,8 @@ static double b = 0;
 // number of max iterations the model runs
 static int max_iterations = 100;
 
-// If the change of loss |last loss - current_loss|<=\epsilon is less than epsilon then we stop
-static double epsilon = 0.05;
+// If the change of loss |last loss - current_loss|<= \tolerance is less than tolerance then we stop
+static double tolerance = 0.05;
 
 /// Learning rate
 static double alpha = 0.05;
@@ -129,7 +129,7 @@ void run_model()
 
         loss = calculate_mean_squared_error(inference_result, y, n);
 
-        if (fabs(loss - last_loss) <= epsilon)
+        if (fabs(loss - last_loss) <= tolerance)
         {
             break;
         }
