@@ -13,9 +13,14 @@ static int max_iterations = 1000000;
 // If the change of loss |last loss - current_loss|<= \tolerance is less than tolerance then we stop
 static double tolerance = 0.05;
 static double tolerance_for_relative_check = 0.00000000000005;
+static double tolerance_for_gradient_norm = 0.000001;
 
 /// Learning rate
 static double alpha = 0.05;
+
+// LAST VALUES
+static double last_delta_m;
+static double last_delta_b;
 
 // Optional function that overwrites the initial set of parameters
 static void set_parameters_init(double l_slope, double l_b)
@@ -102,6 +107,9 @@ static void adjust_parameters(double inference_result[], double y[], double x[],
     double delta_m = calcuate_partial_derivate_of_slope(inference_result, y, x, n);
     double delta_b = calcuate_partial_derivate_of_b(inference_result, y, n);
 
+    last_delta_m = delta_m;
+    last_delta_b = delta_b;
+
     printf("delta_m: %lf \n", delta_m);
     printf("delta_b: %lf \n", delta_b);
 
@@ -142,6 +150,19 @@ static bool is_relative_stopping_criteria_satisfied(double current_loss, double 
     return false;
 }
 
+static bool is_gradient_norm_stopping_criteria_satisfied()
+{
+    double result = sqrt(pow(last_delta_m, 2) + pow(last_delta_b, 2));
+
+    if (result <= tolerance_for_gradient_norm)
+    {
+        printf(">> Gradient norm tolerance stopping createria fullfilled: Error diference: %lf, tolerance (gradient norm): %lf \n", result, tolerance_for_gradient_norm);
+        return true;
+    }
+
+    return false;
+}
+
 void run_model(double x[], double y[], int size)
 {
 
@@ -160,7 +181,7 @@ void run_model(double x[], double y[], int size)
 
         loss = calculate_mean_squared_error(inference_result, y, n);
 
-        if (is_relative_stopping_criteria_satisfied(loss, last_loss))
+        if (i > 0 && is_relative_stopping_criteria_satisfied(loss, last_loss))
         {
             break;
         }

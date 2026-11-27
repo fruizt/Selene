@@ -1,3 +1,5 @@
+#include "input.h"
+
 int input_1_n = 4;
 
 double input_1_x[] = {1, 2, 3, 4};
