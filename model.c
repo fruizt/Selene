@@ -18,10 +18,6 @@ static double tolerance_for_gradient_norm = 0.000001;
 /// Learning rate
 static double alpha = 0.05;
 
-// LAST VALUES
-static double last_delta_m;
-static double last_delta_b;
-
 // Optional function that overwrites the initial set of parameters
 static void set_parameters_init(double l_slope, double l_b)
 {
@@ -101,21 +97,25 @@ static double calcuate_partial_derivate_of_b(double inference_result[], double y
     return result;
 }
 
-static void adjust_parameters(double inference_result[], double y[], double x[], int n)
+static void calculate_gradient(double inference_result[], double y[], double x[], int n, double *delta_m, double *delta_b)
 {
     // Gradient
-    double delta_m = calcuate_partial_derivate_of_slope(inference_result, y, x, n);
-    double delta_b = calcuate_partial_derivate_of_b(inference_result, y, n);
+    *delta_m = calcuate_partial_derivate_of_slope(inference_result, y, x, n);
+    *delta_b = calcuate_partial_derivate_of_b(inference_result, y, n);
 
-    last_delta_m = delta_m;
-    last_delta_b = delta_b;
+    printf("delta_m: %lf \n", *delta_m);
+    printf("delta_b: %lf \n", *delta_b);
 
-    printf("delta_m: %lf \n", delta_m);
-    printf("delta_b: %lf \n", delta_b);
+    return;
+}
 
+static void adjust_parameters(double delta_m, double delta_b)
+{
     // Adjusting parameters
     slope -= (delta_m * alpha);
     b -= (delta_b * alpha);
+
+    return;
 }
 
 static bool is_absolute_stopping_criteria_satisfied(double current_loss, double prior_loss)
@@ -133,7 +133,6 @@ static bool is_absolute_stopping_criteria_satisfied(double current_loss, double 
 
 static bool is_relative_stopping_criteria_satisfied(double current_loss, double prior_loss)
 {
-
     if (prior_loss == 0)
     {
         return is_absolute_stopping_criteria_satisfied(current_loss, prior_loss);
@@ -150,9 +149,9 @@ static bool is_relative_stopping_criteria_satisfied(double current_loss, double 
     return false;
 }
 
-static bool is_gradient_norm_stopping_criteria_satisfied()
+static bool is_gradient_norm_stopping_criteria_satisfied(double delta_m, double delta_b)
 {
-    double result = sqrt(pow(last_delta_m, 2) + pow(last_delta_b, 2));
+    double result = sqrt(pow(delta_m, 2) + pow(delta_b, 2));
 
     if (result <= tolerance_for_gradient_norm)
     {
@@ -165,13 +164,15 @@ static bool is_gradient_norm_stopping_criteria_satisfied()
 
 void run_model(double x[], double y[], int size)
 {
-
     int n = size;
 
     double inference_result[n];
 
     double last_loss = 0;
     double loss;
+
+    double delta_m;
+    double delta_b;
 
     for (int i = 0; i < max_iterations; i++)
     {
@@ -190,7 +191,14 @@ void run_model(double x[], double y[], int size)
 
         last_loss = loss;
 
-        adjust_parameters(inference_result, y, x, n);
+        calculate_gradient(inference_result, y, x, n, &delta_m, &delta_b);
+
+        if (is_gradient_norm_stopping_criteria_satisfied(delta_m, delta_b))
+        {
+            break;
+        }
+
+        adjust_parameters(delta_m, delta_b);
 
         printf("\n");
     }
