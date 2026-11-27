@@ -169,6 +169,12 @@ void run_model(double x[], double y[], int size)
 {
     int n = size;
 
+    if (n == 0)
+    {
+        printf("Array size stated as 0");
+        return;
+    }
+
     // double inference_result[n];
     double *inference_result = malloc(n * sizeof(double));
     if (inference_result == NULL)
@@ -207,14 +213,14 @@ void run_model(double x[], double y[], int size)
             break;
         }
 
-        adjust_parameters(grad_m, grad_b);
-
-        printf("\n");
-
         if (i == max_iterations - 1)
         {
             printf(">> Max iteration condition satisfied, i: %i \n", max_iterations - 1);
         }
+
+        adjust_parameters(grad_m, grad_b);
+
+        printf("\n");
     }
 
     printf("slope: %lf \n", slope);
