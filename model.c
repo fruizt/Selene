@@ -97,23 +97,23 @@ static double calcuate_partial_derivate_of_b(double inference_result[], double y
     return result;
 }
 
-static void calculate_gradient(double inference_result[], double y[], double x[], int n, double *delta_m, double *delta_b)
+static void calculate_gradient(double inference_result[], double y[], double x[], int n, double *grad_m, double *grad_b)
 {
     // Gradient
-    *delta_m = calcuate_partial_derivate_of_slope(inference_result, y, x, n);
-    *delta_b = calcuate_partial_derivate_of_b(inference_result, y, n);
+    *grad_m = calcuate_partial_derivate_of_slope(inference_result, y, x, n);
+    *grad_b = calcuate_partial_derivate_of_b(inference_result, y, n);
 
-    printf("delta_m: %lf \n", *delta_m);
-    printf("delta_b: %lf \n", *delta_b);
+    printf("grad_m: %lf \n", *grad_m);
+    printf("grad_b: %lf \n", *grad_b);
 
     return;
 }
 
-static void adjust_parameters(double delta_m, double delta_b)
+static void adjust_parameters(double grad_m, double grad_b)
 {
     // Adjusting parameters
-    slope -= (delta_m * alpha);
-    b -= (delta_b * alpha);
+    slope -= (grad_m * alpha);
+    b -= (grad_b * alpha);
 
     return;
 }
@@ -149,9 +149,9 @@ static bool is_relative_stopping_criteria_satisfied(double current_loss, double 
     return false;
 }
 
-static bool is_gradient_norm_stopping_criteria_satisfied(double delta_m, double delta_b)
+static bool is_gradient_norm_stopping_criteria_satisfied(double grad_m, double grad_b)
 {
-    double result = sqrt(pow(delta_m, 2) + pow(delta_b, 2));
+    double result = sqrt(pow(grad_m, 2) + pow(grad_b, 2));
 
     if (result <= tolerance_for_gradient_norm)
     {
@@ -171,8 +171,8 @@ void run_model(double x[], double y[], int size)
     double last_loss = 0;
     double loss;
 
-    double delta_m;
-    double delta_b;
+    double grad_m;
+    double grad_b;
 
     for (int i = 0; i < max_iterations; i++)
     {
@@ -191,14 +191,14 @@ void run_model(double x[], double y[], int size)
 
         last_loss = loss;
 
-        calculate_gradient(inference_result, y, x, n, &delta_m, &delta_b);
+        calculate_gradient(inference_result, y, x, n, &grad_m, &grad_b);
 
-        if (is_gradient_norm_stopping_criteria_satisfied(delta_m, delta_b))
+        if (is_gradient_norm_stopping_criteria_satisfied(grad_m, grad_b))
         {
             break;
         }
 
-        adjust_parameters(delta_m, delta_b);
+        adjust_parameters(grad_m, grad_b);
 
         printf("\n");
     }
