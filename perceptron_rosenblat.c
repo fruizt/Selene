@@ -38,7 +38,7 @@ static int calculate_step_function(double z)
     return 0;
 }
 
-// Adjusting the parameters based on batch learning rule
+// Adjusting the parameters based on Rosenblatt's learning rule
 static void adjust_parameters(double x_0, double x_1, double y, double infered_y)
 {
     double difference_y = (y - infered_y);
@@ -63,11 +63,6 @@ static void run_perceptron(double x_0[], double x_1[], double y[])
         double infered_y = calculate_step_function(z);
 
         adjust_parameters(x_0[i], x_1[i], y[i], infered_y);
-
-        if (no_corrections == true)
-        {
-            break;
-        }
     }
 
     if (last_w_0 == w_0 && last_w_1 == w_1 && last_b == b)
