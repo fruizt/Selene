@@ -1,6 +1,7 @@
 #include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 /// Model Parameters.
 static double slope = 1;
@@ -10,16 +11,18 @@ static double b = 0;
 // number of max iterations the model runs
 static int max_iterations = 1000000;
 
-// If the change of loss |last loss - current_loss|<= \tolerance is less than tolerance then we stop
+// If the change of loss |last loss - current_loss|<= \tolerance is less than tolerance then the model stops.
 static double tolerance = 0.05;
+// If the relative change of loss is less than the tolerance the model stops
 static double tolerance_for_relative_check = 0.00000000000005;
+// If the norm of the gradient is less than the tolerance the model stops
 static double tolerance_for_gradient_norm = 0.000001;
 
 /// Learning rate
 static double alpha = 0.05;
 
 // Optional function that overwrites the initial set of parameters
-static void set_parameters_init(double l_slope, double l_b)
+void set_parameters_init(double l_slope, double l_b)
 {
     slope = l_slope;
     b = l_b;
@@ -65,7 +68,7 @@ static double calculate_mean_squared_error(double inference_result[], double y[]
     return result;
 }
 
-static double calcuate_partial_derivate_of_slope(double inference_result[], double y[], double x[], int n)
+static double calculate_partial_derivate_of_slope(double inference_result[], double y[], double x[], int n)
 {
     double result = 0;
 
@@ -81,7 +84,7 @@ static double calcuate_partial_derivate_of_slope(double inference_result[], doub
     return result;
 }
 
-static double calcuate_partial_derivate_of_b(double inference_result[], double y[], int n)
+static double calculate_partial_derivate_of_b(double inference_result[], double y[], int n)
 {
     double result = 0;
 
@@ -100,8 +103,8 @@ static double calcuate_partial_derivate_of_b(double inference_result[], double y
 static void calculate_gradient(double inference_result[], double y[], double x[], int n, double *grad_m, double *grad_b)
 {
     // Gradient
-    *grad_m = calcuate_partial_derivate_of_slope(inference_result, y, x, n);
-    *grad_b = calcuate_partial_derivate_of_b(inference_result, y, n);
+    *grad_m = calculate_partial_derivate_of_slope(inference_result, y, x, n);
+    *grad_b = calculate_partial_derivate_of_b(inference_result, y, n);
 
     printf("grad_m: %lf \n", *grad_m);
     printf("grad_b: %lf \n", *grad_b);
@@ -166,7 +169,13 @@ void run_model(double x[], double y[], int size)
 {
     int n = size;
 
-    double inference_result[n];
+    // double inference_result[n];
+    double *inference_result = malloc(n * sizeof(double));
+    if (inference_result == NULL)
+    {
+        printf("Could not allocate the memory for inference result");
+        return;
+    }
 
     double last_loss = 0;
     double loss;
@@ -182,12 +191,12 @@ void run_model(double x[], double y[], int size)
 
         loss = calculate_mean_squared_error(inference_result, y, n);
 
+        printf("Loss: %lf \n", loss);
+
         if (i > 0 && is_relative_stopping_criteria_satisfied(loss, last_loss))
         {
             break;
         }
-
-        printf("Loss: %lf \n", loss);
 
         last_loss = loss;
 
@@ -201,10 +210,17 @@ void run_model(double x[], double y[], int size)
         adjust_parameters(grad_m, grad_b);
 
         printf("\n");
+
+        if (i == max_iterations - 1)
+        {
+            printf(">> Max iteration condition satisfied, i: %i \n", max_iterations - 1);
+        }
     }
 
     printf("slope: %lf \n", slope);
     printf("b: %lf \n", b);
+
+    free(inference_result);
 
     return;
 }
