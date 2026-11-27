@@ -155,7 +155,7 @@ static bool is_gradient_norm_stopping_criteria_satisfied(double delta_m, double 
 
     if (result <= tolerance_for_gradient_norm)
     {
-        printf(">> Gradient norm tolerance stopping createria fullfilled: Error diference: %lf, tolerance (gradient norm): %lf \n", result, tolerance_for_gradient_norm);
+        printf(">> Gradient norm tolerance stopping createria fullfilled: Gradient norm: %lf, tolerance (gradient norm): %lf \n", result, tolerance_for_gradient_norm);
         return true;
     }
 
