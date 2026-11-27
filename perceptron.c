@@ -28,7 +28,7 @@ static int size = 0;
 static int max_iterations = 1000;
 static bool no_corrections = false;
 
-static void calculate_weighted_sum(double x_0[], double x_1[], double z[])
+static void run_perceptron(double x_0[], double x_1[], double z[])
 {
     for (int i = 0; i < size; i++)
     {
@@ -56,7 +56,7 @@ static void calculate_step_function(double z[], double infered_y[])
     return;
 }
 
-// Adjusting the parameters based on Rosenblatt's learning rule
+// Adjusting the parameters based on batch learning rule
 static void adjust_parameters(double x_0[], double x_1[], double y[], double infered_y[])
 {
     // double current_w_0 = w_0;
@@ -118,7 +118,7 @@ void run_perceptron_model()
     // Epoch
     for (; epoch < max_iterations; epoch++)
     {
-        calculate_weighted_sum(x_0, x_1, z);
+        run_perceptron(x_0, x_1, z);
 
         calculate_step_function(z, infered_y);
 
