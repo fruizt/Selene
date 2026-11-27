@@ -1,14 +1,8 @@
 #include "model.h"
+#include "examples/input.h"
 
 int main()
 {
-
-    /// Dummy test
-    int n = 4;
-
-    double x[] = {1, 2, 3, 4};
-    double y[] = {2, 5, 5, 8};
-
-    run_model(x, y, n);
+    run_model(input_1_x, input_1_y, input_1_n);
     return 0;
 }
