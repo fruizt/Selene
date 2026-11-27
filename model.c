@@ -42,7 +42,7 @@ static void calculate_inference(double x[], double inference_result[], int n)
     {
         inference_result[i] = infer(x[i]);
 
-        printf("Infered value: %lf \n", inference_result[i]);
+        // printf("Infered value: %lf \n", inference_result[i]);
     }
 
     return;
@@ -169,9 +169,9 @@ void run_model(double x[], double y[], int size)
 {
     int n = size;
 
-    if (n == 0)
+    if (n <= 0)
     {
-        printf("Array size stated as 0");
+        fprintf(stderr, "Array size stated as 0 or negative\n");
         return;
     }
 
@@ -179,7 +179,7 @@ void run_model(double x[], double y[], int size)
     double *inference_result = malloc(n * sizeof(double));
     if (inference_result == NULL)
     {
-        printf("Could not allocate the memory for inference result");
+        fprintf(stderr, "Could not allocate the memory for inference result\n");
         return;
     }
 
@@ -216,6 +216,7 @@ void run_model(double x[], double y[], int size)
         if (i == max_iterations - 1)
         {
             printf(">> Max iteration condition satisfied, i: %i \n", max_iterations - 1);
+            break;
         }
 
         adjust_parameters(grad_m, grad_b);
