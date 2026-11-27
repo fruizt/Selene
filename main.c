@@ -3,6 +3,6 @@
 
 int main()
 {
-    run_model(input_1_x, input_1_y, input_1_n);
+    run_model(input_2_x, input_2_y, input_2_n);
     return 0;
 }
