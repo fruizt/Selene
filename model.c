@@ -8,11 +8,11 @@ static double b = 0;
 
 /// Stop parameters
 // number of max iterations the model runs
-static int max_iterations = 100;
+static int max_iterations = 1000000;
 
 // If the change of loss |last loss - current_loss|<= \tolerance is less than tolerance then we stop
 static double tolerance = 0.05;
-static double tolerance_for_relative_check = 0.00005;
+static double tolerance_for_relative_check = 0.00000000000005;
 
 /// Learning rate
 static double alpha = 0.05;
@@ -38,7 +38,7 @@ static void calculate_inference(double x[], double inference_result[], int n)
     {
         inference_result[i] = infer(x[i]);
 
-        printf("Infered value: %f \n", inference_result[i]);
+        printf("Infered value: %lf \n", inference_result[i]);
     }
 
     return;
@@ -54,7 +54,7 @@ static double calculate_mean_squared_error(double inference_result[], double y[]
     {
         double partial_result = pow(inference_result[i] - y[i], 2);
 
-        printf("partial error: (%f - %f)^2  = %f \n", inference_result[i], y[i], partial_result);
+        printf("partial error: (%lf - %lf)^2  = %lf \n", inference_result[i], y[i], partial_result);
 
         result += partial_result;
     }
@@ -102,8 +102,8 @@ static void adjust_parameters(double inference_result[], double y[], double x[],
     double delta_m = calcuate_partial_derivate_of_slope(inference_result, y, x, n);
     double delta_b = calcuate_partial_derivate_of_b(inference_result, y, n);
 
-    printf("delta_m: %f \n", delta_m);
-    printf("delta_b: %f \n", delta_b);
+    printf("delta_m: %lf \n", delta_m);
+    printf("delta_b: %lf \n", delta_b);
 
     // Adjusting parameters
     slope -= (delta_m * alpha);
@@ -116,7 +116,7 @@ static bool is_absolute_stopping_criteria_satisfied(double current_loss, double 
 
     if (delta_error <= tolerance)
     {
-        printf(">> Absolute error change stopping createria fullfilled: Error diference: %f, tolerance (absolute): %f \n", delta_error, tolerance);
+        printf(">> Absolute error change stopping createria fullfilled: Error diference: %lf, tolerance (absolute): %lf \n", delta_error, tolerance);
         return true;
     }
 
@@ -125,24 +125,27 @@ static bool is_absolute_stopping_criteria_satisfied(double current_loss, double 
 
 static bool is_relative_stopping_criteria_satisfied(double current_loss, double prior_loss)
 {
+
+    if (prior_loss == 0)
+    {
+        return is_absolute_stopping_criteria_satisfied(current_loss, prior_loss);
+    }
+
     double delta_error = fabs(current_loss - prior_loss) / fabs(prior_loss);
 
     if (delta_error <= tolerance_for_relative_check)
     {
-        printf(">> Relative error change stopping createria fullfilled: Error diference: %f, tolerance (relative): %f \n", delta_error, tolerance_for_relative_check);
+        printf(">> Relative error change stopping createria fullfilled: Error diference: %lf, tolerance (relative): %lf \n", delta_error, tolerance_for_relative_check);
         return true;
     }
 
     return false;
 }
 
-void run_model()
+void run_model(double x[], double y[], int size)
 {
-    /// Dummy test
-    int n = 4;
 
-    double x[] = {1, 2, 3, 4};
-    double y[] = {2, 5, 5, 8};
+    int n = size;
 
     double inference_result[n];
 
@@ -162,7 +165,7 @@ void run_model()
             break;
         }
 
-        printf("Loss: %f \n", loss);
+        printf("Loss: %lf \n", loss);
 
         last_loss = loss;
 
@@ -171,8 +174,8 @@ void run_model()
         printf("\n");
     }
 
-    printf("slope: %f \n", slope);
-    printf("b: %f \n", b);
+    printf("slope: %lf \n", slope);
+    printf("b: %lf \n", b);
 
     return;
 }
